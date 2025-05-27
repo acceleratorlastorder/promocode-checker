@@ -1,0 +1,20 @@
+services:
+    app:
+        build:
+            context: .
+            dockerfile: Dockerfile
+            target: production
+        container_name: promocode-checker-app
+        ports:
+            - 3000:3000
+        environment:
+            DATABASE_URL: ${DATABASE_URL}
+            API_KEY: ${API_KEY}
+            OPENWEATHERMAP_API_KEY: ${OPENWEATHERMAP_API_KEY}
+            OPENWEATHERMAP_API_URL: ${OPENWEATHERMAP_API_URL}
+        depends_on: []
+        networks:
+            - promocode-network
+
+networks:
+    promocode-network:

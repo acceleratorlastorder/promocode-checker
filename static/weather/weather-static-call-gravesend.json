@@ -1,0 +1,46 @@
+{
+    "coord": {
+        "lon": 0.3704,
+        "lat": 51.443
+    },
+    "weather": [
+        {
+            "id": 804,
+            "main": "Clouds",
+            "description": "overcast clouds",
+            "icon": "04n"
+        }
+    ],
+    "base": "stations",
+    "main": {
+        "temp": 288.84,
+        "feels_like": 287.69,
+        "temp_min": 287.93,
+        "temp_max": 289.31,
+        "pressure": 1013,
+        "humidity": 47,
+        "sea_level": 1013,
+        "grnd_level": 1009
+    },
+    "visibility": 10000,
+    "wind": {
+        "speed": 5.55,
+        "deg": 260,
+        "gust": 10.42
+    },
+    "clouds": {
+        "all": 87
+    },
+    "dt": 1748203481,
+    "sys": {
+        "type": 2,
+        "id": 2011528,
+        "country": "GB",
+        "sunrise": 1748145242,
+        "sunset": 1748203034
+    },
+    "timezone": 3600,
+    "id": 2648187,
+    "name": "Gravesend",
+    "cod": 200
+}

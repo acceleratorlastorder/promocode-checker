@@ -1,0 +1,49 @@
+{
+    "coord": {
+        "lon": 13.4105,
+        "lat": 52.5244
+    },
+    "weather": [
+        {
+            "id": 600,
+            "main": "Snow",
+            "description": "light snow",
+            "icon": "13d"
+        }
+    ],
+    "base": "stations",
+    "main": {
+        "temp": 271.15,
+        "feels_like": 267.85,
+        "temp_min": 269.82,
+        "temp_max": 272.41,
+        "pressure": 1018,
+        "humidity": 88,
+        "sea_level": 1018,
+        "grnd_level": 1015
+    },
+    "visibility": 5000,
+    "wind": {
+        "speed": 2.89,
+        "deg": 330,
+        "gust": 4.15
+    },
+    "clouds": {
+        "all": 95
+    },
+    "snow": {
+        "1h": 0.25
+    },
+    "dt": 1748203481,
+    "sys": {
+        "type": 2,
+        "id": 2011578,
+        "country": "DE",
+        "sunrise": 1748145892,
+        "sunset": 1748202156
+    },
+    "timezone": 3600,
+    "id": 2950159,
+    "name": "Berlin",
+    "cod": 200
+}

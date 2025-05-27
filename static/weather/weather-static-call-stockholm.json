@@ -1,0 +1,49 @@
+{
+    "coord": {
+        "lon": 18.0649,
+        "lat": 59.3326
+    },
+    "weather": [
+        {
+            "id": 211,
+            "main": "Thunderstorm",
+            "description": "thunderstorm",
+            "icon": "11d"
+        }
+    ],
+    "base": "stations",
+    "main": {
+        "temp": 278.15,
+        "feels_like": 274.85,
+        "temp_min": 276.82,
+        "temp_max": 279.41,
+        "pressure": 1005,
+        "humidity": 92,
+        "sea_level": 1005,
+        "grnd_level": 1002
+    },
+    "visibility": 3000,
+    "wind": {
+        "speed": 8.89,
+        "deg": 310,
+        "gust": 15.22
+    },
+    "clouds": {
+        "all": 98
+    },
+    "rain": {
+        "1h": 2.45
+    },
+    "dt": 1748203481,
+    "sys": {
+        "type": 2,
+        "id": 2011605,
+        "country": "SE",
+        "sunrise": 1748143892,
+        "sunset": 1748201356
+    },
+    "timezone": 3600,
+    "id": 2673730,
+    "name": "Stockholm",
+    "cod": 200
+}
