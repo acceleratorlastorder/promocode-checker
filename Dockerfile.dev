@@ -1,0 +1,24 @@
+# Development Dockerfile
+FROM node:20-alpine
+
+# Set working directory
+WORKDIR /app
+
+# Install dependencies for development
+COPY package*.json ./
+RUN npm install
+
+# Copy source code
+COPY . .
+
+# Install global tools for development
+RUN npm install -g nodemon ts-node
+
+# Create logs directory
+RUN mkdir -p logs
+
+# Expose ports
+EXPOSE 3000 9229
+
+# Development command with hot reload and debugging
+CMD ["npm", "run", "dev"] 

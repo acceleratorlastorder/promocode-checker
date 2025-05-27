@@ -1,0 +1,490 @@
+openapi: 3.1.0
+info:
+    title: Promocode API
+    description: API for managing and validating promocodes with complex rule-based validation
+    version: 1.0.0
+servers:
+    - url: "{protocol}://{host}:{port}"
+      description: Development server
+      variables:
+          protocol:
+              default: "http"
+          host:
+              default: "localhost"
+          port:
+              default: "3000"
+
+paths:
+    /ping:
+        get:
+            summary: Health check endpoint
+            description: Returns the health status of the API
+            tags: [Health]
+            responses:
+                "200":
+                    description: API is healthy
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/HealthResponse"
+
+    /api/promocodes:
+        get:
+            summary: List all promocodes (Admin only)
+            description: Retrieves all promocodes in the system
+            tags: [Promocodes, Admin]
+            security:
+                - ApiKeyAuth: []
+                - BearerAuth: []
+            responses:
+                "200":
+                    description: List of all promocodes
+                    content:
+                        application/json:
+                            schema:
+                                type: array
+                                items:
+                                    $ref: "#/components/schemas/Promocode"
+                            examples:
+                                promocodes_list:
+                                    summary: Example list of promocodes
+                                    value:
+                                        - name: "SIMPLE20"
+                                          advantage:
+                                              percent: 20
+                                          restrictions:
+                                              - age:
+                                                    gte: 18
+                                        - name: "WeatherCode"
+                                          advantage:
+                                              percent: 20
+                                          restrictions:
+                                              - date:
+                                                    after: "2024-01-01"
+                                                    before: "2026-12-31"
+                                              - or:
+                                                    - age:
+                                                          eq: 40
+                                                    - and:
+                                                          - age:
+                                                                lt: 30
+                                                                gt: 15
+                                                          - weather:
+                                                                is: "clear"
+                                                                temp:
+                                                                    gt: 15
+                "401":
+                    description: Unauthorized - missing or invalid API key
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/ErrorResponse"
+                "500":
+                    description: Internal server error
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/ErrorResponse"
+
+        post:
+            summary: Create a new promocode (Admin only)
+            description: Creates a new promocode with specified advantages and restrictions
+            tags: [Promocodes, Admin]
+            security:
+                - ApiKeyAuth: []
+                - BearerAuth: []
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/Promocode"
+                        examples:
+                            simple:
+                                summary: Simple age-based promocode
+                                value:
+                                    name: "SIMPLE20"
+                                    advantage:
+                                        percent: 20
+                                    restrictions:
+                                        - age:
+                                              gte: 18
+                            complex:
+                                summary: Complex weather and age-based promocode
+                                value:
+                                    name: "WeatherCode"
+                                    advantage:
+                                        percent: 20
+                                    restrictions:
+                                        - date:
+                                              after: "2024-01-01"
+                                              before: "2026-12-31"
+                                        - or:
+                                              - age:
+                                                    eq: 40
+                                              - and:
+                                                    - age:
+                                                          lt: 30
+                                                          gt: 15
+                                                    - weather:
+                                                          is: "clear"
+                                                          temp:
+                                                              gt: 15
+            responses:
+                "201":
+                    description: Promocode created successfully
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Promocode"
+                "400":
+                    description: Invalid request data
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/ErrorResponse"
+                "401":
+                    description: Unauthorized - missing or invalid API key
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/ErrorResponse"
+                "409":
+                    description: Promocode with this name already exists
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/ErrorResponse"
+                "500":
+                    description: Internal server error
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/ErrorResponse"
+
+    /api/promocodes/validate:
+        post:
+            summary: Validate a promocode
+            description: Validates a promocode against user arguments and returns the result
+            tags: [Promocodes]
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/ValidationRequest"
+                        examples:
+                            age_only:
+                                summary: Validation with age only
+                                value:
+                                    promocode_name: "SIMPLE20"
+                                    arguments:
+                                        age: 25
+                            age_and_location:
+                                summary: Validation with age and location
+                                value:
+                                    promocode_name: "WeatherCode"
+                                    arguments:
+                                        age: 25
+                                        town: "Lyon"
+            responses:
+                "200":
+                    description: Validation completed
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/ValidationResponse"
+                            examples:
+                                accepted:
+                                    summary: Promocode accepted
+                                    value:
+                                        promocode_name: "WeatherCode"
+                                        status: "accepted"
+                                        advantage:
+                                            percent: 20
+                                denied:
+                                    summary: Promocode denied
+                                    value:
+                                        promocode_name: "WeatherCode"
+                                        status: "denied"
+                                        reasons:
+                                            - "Condition for 'age' was not met: expected 35 to be equal 40"
+                                            - 'Condition for ''weather'' was not met: expected "rain" to be equal "clear"'
+                "400":
+                    description: Invalid request data
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/ErrorResponse"
+                "404":
+                    description: Promocode not found
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/ValidationResponse"
+                "500":
+                    description: Internal server error
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/ErrorResponse"
+
+    /api/promocodes/{name}:
+        delete:
+            summary: Delete a promocode (Admin only)
+            description: Deletes a specific promocode by name
+            tags: [Promocodes, Admin]
+            security:
+                - ApiKeyAuth: []
+                - BearerAuth: []
+            parameters:
+                - name: name
+                  in: path
+                  required: true
+                  schema:
+                      type: string
+                      minLength: 1
+                      maxLength: 100
+                  description: Name of the promocode to delete
+                  example: "SIMPLE20"
+            responses:
+                "204":
+                    description: Promocode deleted successfully (no content)
+                "401":
+                    description: Unauthorized - missing or invalid API key
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/ErrorResponse"
+                "404":
+                    description: Promocode not found
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/ErrorResponse"
+                "500":
+                    description: Internal server error
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/ErrorResponse"
+
+tags:
+    - name: Health
+      description: Health check endpoint
+    - name: Promocodes
+      description: Normal operations
+    - name: Admin
+      description: Admin-only operations requiring elevated privileges
+
+components:
+    securitySchemes:
+        ApiKeyAuth:
+            type: apiKey
+            in: header
+            name: X-API-Key
+            description: API key for authentication
+        BearerAuth:
+            type: http
+            scheme: bearer
+            description: Bearer token authentication
+    schemas:
+        # Reusable Components
+        PromocodeAdvantage:
+            type: object
+            description: The benefit offered by the promocode
+            properties:
+                percent:
+                    type: number
+                    minimum: 0
+                    maximum: 100
+                amount:
+                    type: number
+                    minimum: 0
+                type:
+                    type: string
+                    enum: [discount, cashback, freeShipping]
+            additionalProperties: true
+
+        # Core Promocode Schema
+        Promocode:
+            type: object
+            required: [name, advantage, restrictions]
+            properties:
+                name:
+                    type: string
+                    description: Unique name for the promocode
+                    minLength: 1
+                    maxLength: 100
+                advantage:
+                    $ref: "#/components/schemas/PromocodeAdvantage"
+                restrictions:
+                    type: array
+                    description: Array of restriction rules that must be satisfied
+                    items:
+                        $ref: "#/components/schemas/RestrictionRule"
+                convertedRule:
+                    type: object
+                    description: Internal field - pre-converted rules for json-rules-engine (automatically generated)
+                    additionalProperties: true
+                    readOnly: true
+
+        # Restriction Rules Schema
+        RestrictionRule:
+            type: object
+            additionalProperties: false
+            properties:
+                # Age restrictions
+                age:
+                    type: object
+                    properties:
+                        eq:
+                            type: integer
+                            minimum: 0
+                            maximum: 150
+                        lt:
+                            type: integer
+                            minimum: 0
+                            maximum: 150
+                        gt:
+                            type: integer
+                            minimum: 0
+                            maximum: 150
+                        lte:
+                            type: integer
+                            minimum: 0
+                            maximum: 150
+                        gte:
+                            type: integer
+                            minimum: 0
+                            maximum: 150
+                    additionalProperties: false
+                    minProperties: 1
+
+                # Date restrictions
+                date:
+                    type: object
+                    properties:
+                        after:
+                            type: string
+                            format: date
+                            description: Date in YYYY-MM-DD format
+                        before:
+                            type: string
+                            format: date
+                            description: Date in YYYY-MM-DD format
+                    additionalProperties: false
+                    minProperties: 1
+
+                # Weather restrictions
+                weather:
+                    type: object
+                    properties:
+                        is:
+                            type: string
+                            enum: [clear, rain, snow, cloudy, storm]
+                        temp:
+                            type: object
+                            properties:
+                                gt:
+                                    type: number
+                                    minimum: -50
+                                    maximum: 60
+                                lt:
+                                    type: number
+                                    minimum: -50
+                                    maximum: 60
+                                gte:
+                                    type: number
+                                    minimum: -50
+                                    maximum: 60
+                                lte:
+                                    type: number
+                                    minimum: -50
+                                    maximum: 60
+                            additionalProperties: false
+                            minProperties: 1
+                    additionalProperties: false
+                    minProperties: 1
+
+                # Logical operators
+                or:
+                    type: array
+                    items:
+                        $ref: "#/components/schemas/RestrictionRule"
+                    minItems: 2
+                and:
+                    type: array
+                    items:
+                        $ref: "#/components/schemas/RestrictionRule"
+                    minItems: 2
+
+        # Validation Request Schema
+        ValidationRequest:
+            type: object
+            required: [promocode_name, arguments]
+            properties:
+                promocode_name:
+                    type: string
+                    description: Name of the promocode to validate
+                    minLength: 1
+                arguments:
+                    type: object
+                    description: User arguments for validation
+                    properties:
+                        age:
+                            type: integer
+                            minimum: 0
+                            maximum: 150
+                            description: User's age
+                        town:
+                            type: string
+                            minLength: 1
+                            maxLength: 100
+                            description: User's location for weather check
+                    additionalProperties: false
+
+        # Validation Response Schema
+        ValidationResponse:
+            type: object
+            required: [promocode_name, status]
+            properties:
+                promocode_name:
+                    type: string
+                status:
+                    type: string
+                    enum: [accepted, denied]
+                advantage:
+                    allOf:
+                        - $ref: "#/components/schemas/PromocodeAdvantage"
+                        - description: The advantage granted (only present when status is accepted)
+                reasons:
+                    type: array
+                    items:
+                        type: string
+                    description: Reasons for denial (only present when status is denied)
+
+        # Error Response Schema
+        ErrorResponse:
+            type: object
+            required: [error]
+            properties:
+                error:
+                    type: string
+                    description: Error message
+                details:
+                    type: object
+                    description: Additional error details
+                    additionalProperties: true
+
+        # Health Check Response
+        HealthResponse:
+            type: object
+            required: [status, timestamp]
+            properties:
+                status:
+                    type: string
+                    enum: [ok]
+                timestamp:
+                    type: string
+                    format: date-time
