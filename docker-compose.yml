@@ -12,6 +12,7 @@ services:
             API_KEY: ${API_KEY}
             OPENWEATHERMAP_API_KEY: ${OPENWEATHERMAP_API_KEY}
             OPENWEATHERMAP_API_URL: ${OPENWEATHERMAP_API_URL}
+            ALLOWED_ORIGINS: ${ALLOWED_ORIGINS}
         depends_on: []
         networks:
             - promocode-network
