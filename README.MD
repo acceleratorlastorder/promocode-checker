@@ -23,7 +23,7 @@ J’aime bien la structure ! Voici quelques suggestions et une version retravail
 - **Cursor** pour accélérer le dev (savoir maitriser l'IA est important en tant que dev).
 - **IA (ChatGPT)** pour générer du code, avec un regard plus ciblé et critique pour étailler les propositions.
 
-> Pour l’installation, merci de vous référer au fichier [INSTALLATION.md](./INSTALLATION.md).
+> Pour l’installation, merci de vous référer au fichier [INSTALLATION.MD](./INSTALLATION.MD).
 
 ---
 
