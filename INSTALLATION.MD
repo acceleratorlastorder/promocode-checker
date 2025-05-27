@@ -131,7 +131,7 @@ Copiez les mêmes variables `.env` que pour l’installation locale. Docker Comp
 ### 2. Démarrage (Si vous n'avez pas déjà de base de données PostgreSQL existante)
 
 ```bash
-docker compose -f docker-compose.db.yml --env-file ./.env up -d
+docker compose -f docker-compose.db.yml up -d
 ```
 
 Cela lancera :
@@ -145,7 +145,7 @@ Une fois les services up, vous pouvez en suite utiliser la commande de l'étape 
 ### 3. Démarrage en mode « standalone » (si PostgreSQL existe déjà ou après avoir lancer)
 
 ```bash
-docker compose --env-file ./.env up -d
+docker compose up -d
 ```
 
 Cela lancera :
