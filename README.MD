@@ -2,15 +2,6 @@
 
 ## 📊 Synthèse du projet « Promocode API »
 
-### ⏱️ Temps investi
-
-- **≈ 8 heures** de développement.
-
-### 🛠️ Outils et méthodologie
-
-- **Cursor** pour accélérer le dev (savoir maitriser l'IA est important en tant que dev).
-- **IA (ChatGPT)** pour générer du code, avec un regard plus ciblé et critique pour étailler les propositions.
-
 > Pour l’installation, merci de vous référer au fichier [INSTALLATION.MD](./INSTALLATION.MD).
 
 ---
