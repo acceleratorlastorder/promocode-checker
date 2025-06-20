@@ -26,9 +26,12 @@ export class RuleTransformationService {
     ): ConditionProperties | AllConditions | AnyConditions {
         if (this.isOrCondition(definition)) return this.handleOrCondition(definition);
         if (this.isAndCondition(definition)) return this.handleAndCondition(definition);
-        if (this.isAgeCondition(definition)) return this.handleAgeCondition(definition);
-        if (this.isDateCondition(definition)) return this.handleDateCondition(definition);
-        if (this.isWeatherCondition(definition)) return this.handleWeatherCondition(definition);
+        if (this.isHandlerConditionTrue("age", definition)) return this.handleAgeCondition(definition);
+        if (this.isHandlerConditionTrue("date", definition)) return this.handleDateCondition(definition);
+        if (this.isHandlerConditionTrue("weather", definition)) return this.handleWeatherCondition(definition);
+        if (this.isHandlerConditionTrue("distance", definition)) {
+            return this.handleDistanceCondition(definition);
+        }
         return definition as unknown as ConditionProperties;
     }
 
@@ -96,40 +99,94 @@ export class RuleTransformationService {
         };
     }
 
-    private isAndCondition(definition: Record<string, unknown>): boolean {
-        return Object.hasOwn(definition, "and") && Array.isArray(definition.and);
-    }
-
     private handleAndCondition(definition: Record<string, unknown>): AllConditions {
         return {
             all: this.transformRestrictions(definition.and as Record<string, unknown>[]),
         };
     }
 
-    private isAgeCondition(definition: Record<string, unknown>): boolean {
+    private isAndCondition(definition: Record<string, unknown>): boolean {
+        return Object.hasOwn(definition, "and") &&
+            Array.isArray(definition.and);
+    }
+
+
+    private isHandlerConditionTrue(handlerName: string, definition: Record<string, unknown>): boolean {
         return (
-            Object.hasOwn(definition, "age") &&
-            typeof definition.age === "object" &&
-            !Array.isArray(definition.age) &&
-            definition.age !== null
+            Object.hasOwn(definition, handlerName) &&
+            typeof definition[handlerName] === "object" &&
+            !Array.isArray(definition[handlerName]) &&
+            definition[handlerName] !== null
         );
     }
 
-    private handleAgeCondition(definition: Record<string, unknown>): ConditionProperties {
-        const ageRule = definition.age as Record<string, number>;
-        const operator = Object.keys(ageRule)[0];
-        const value = ageRule[operator];
+    private handleDistanceCondition(definition: Record<string, unknown>): ConditionProperties | AllConditions {
+        const distanceRule = definition.distance as Record<string, number>;
+        const operators = Object.keys(distanceRule);
 
-        const engineOperator = this.mapAgeOperator(operator);
+        // If only one operator, return a single condition
+        if (operators.length === 1) {
+            const operator = operators[0];
+            const value = distanceRule[operator];
+            const engineOperator = this.mapEqualityOperator(operator);
 
-        return {
-            fact: "age",
-            operator: engineOperator,
-            value,
-        } as ConditionProperties;
+            return {
+                fact: "distance",
+                operator: engineOperator,
+                value,
+            } as ConditionProperties;
+        }
+
+        // If multiple operators, return all conditions
+        const conditions: ConditionProperties[] = [];
+        for (const operator of operators) {
+            const value = distanceRule[operator];
+            const engineOperator = this.mapEqualityOperator(operator);
+
+            conditions.push({
+                fact: "distance",
+                operator: engineOperator,
+                value,
+            } as ConditionProperties);
+        }
+
+        return { all: conditions };
     }
 
-    private mapAgeOperator(
+    private handleAgeCondition(definition: Record<string, unknown>): ConditionProperties | AllConditions {
+        const ageRule = definition.age as Record<string, number>;
+        const operators = Object.keys(ageRule);
+
+        // If only one operator, return a single condition
+        if (operators.length === 1) {
+            const operator = operators[0];
+            const value = ageRule[operator];
+            const engineOperator = this.mapEqualityOperator(operator);
+
+            return {
+                fact: "age",
+                operator: engineOperator,
+                value,
+            } as ConditionProperties;
+        }
+
+        // If multiple operators, return all conditions
+        const conditions: ConditionProperties[] = [];
+        for (const operator of operators) {
+            const value = ageRule[operator];
+            const engineOperator = this.mapEqualityOperator(operator);
+
+            conditions.push({
+                fact: "age",
+                operator: engineOperator,
+                value,
+            } as ConditionProperties);
+        }
+
+        return { all: conditions };
+    }
+
+    private mapEqualityOperator(
         operator: string,
     ): "equal" | "lessThan" | "greaterThan" | "lessThanInclusive" | "greaterThanInclusive" {
         switch (operator) {
@@ -146,15 +203,6 @@ export class RuleTransformationService {
             default:
                 throw new Error(`Unsupported age operator: ${operator}`);
         }
-    }
-
-    private isDateCondition(definition: Record<string, unknown>): boolean {
-        return (
-            Object.hasOwn(definition, "date") &&
-            typeof definition.date === "object" &&
-            !Array.isArray(definition.date) &&
-            definition.date !== null
-        );
     }
 
     private handleDateCondition(definition: Record<string, unknown>): AllConditions {
@@ -178,15 +226,6 @@ export class RuleTransformationService {
         }
 
         return { all: conditions };
-    }
-
-    private isWeatherCondition(definition: Record<string, unknown>): boolean {
-        return (
-            Object.hasOwn(definition, "weather") &&
-            typeof definition.weather === "object" &&
-            !Array.isArray(definition.weather) &&
-            definition.weather !== null
-        );
     }
 
     private handleWeatherCondition(definition: Record<string, unknown>): AllConditions {
