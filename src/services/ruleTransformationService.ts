@@ -26,9 +26,12 @@ export class RuleTransformationService {
     ): ConditionProperties | AllConditions | AnyConditions {
         if (this.isOrCondition(definition)) return this.handleOrCondition(definition);
         if (this.isAndCondition(definition)) return this.handleAndCondition(definition);
-        if (this.isHandlerConditionTrue("age", definition)) return this.handleAgeCondition(definition);
-        if (this.isHandlerConditionTrue("date", definition)) return this.handleDateCondition(definition);
-        if (this.isHandlerConditionTrue("weather", definition)) return this.handleWeatherCondition(definition);
+        if (this.isHandlerConditionTrue("age", definition))
+            return this.handleAgeCondition(definition);
+        if (this.isHandlerConditionTrue("date", definition))
+            return this.handleDateCondition(definition);
+        if (this.isHandlerConditionTrue("weather", definition))
+            return this.handleWeatherCondition(definition);
         if (this.isHandlerConditionTrue("distance", definition)) {
             return this.handleDistanceCondition(definition);
         }
@@ -106,12 +109,13 @@ export class RuleTransformationService {
     }
 
     private isAndCondition(definition: Record<string, unknown>): boolean {
-        return Object.hasOwn(definition, "and") &&
-            Array.isArray(definition.and);
+        return Object.hasOwn(definition, "and") && Array.isArray(definition.and);
     }
 
-
-    private isHandlerConditionTrue(handlerName: string, definition: Record<string, unknown>): boolean {
+    private isHandlerConditionTrue(
+        handlerName: string,
+        definition: Record<string, unknown>,
+    ): boolean {
         return (
             Object.hasOwn(definition, handlerName) &&
             typeof definition[handlerName] === "object" &&
@@ -120,7 +124,9 @@ export class RuleTransformationService {
         );
     }
 
-    private handleDistanceCondition(definition: Record<string, unknown>): ConditionProperties | AllConditions {
+    private handleDistanceCondition(
+        definition: Record<string, unknown>,
+    ): ConditionProperties | AllConditions {
         const distanceRule = definition.distance as Record<string, number>;
         const operators = Object.keys(distanceRule);
 
@@ -153,7 +159,9 @@ export class RuleTransformationService {
         return { all: conditions };
     }
 
-    private handleAgeCondition(definition: Record<string, unknown>): ConditionProperties | AllConditions {
+    private handleAgeCondition(
+        definition: Record<string, unknown>,
+    ): ConditionProperties | AllConditions {
         const ageRule = definition.age as Record<string, number>;
         const operators = Object.keys(ageRule);
 
