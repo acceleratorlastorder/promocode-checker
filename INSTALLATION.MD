@@ -1,188 +1,195 @@
+---
+
 # Installation
 
-Ce document explique comment installer et lancer l’API **Promocode Service** en local ou via Docker / Docker Compose.
+This guide explains how to install and run the **Promocode Service** API locally or using Docker / Docker Compose.
 
 ---
 
-## 🔧 Prérequis
+## 🔧 Prerequisites
 
-- **Node.js** ≥ 22.x
-- **npm** (installé avec Node.js)
-- **PostgreSQL** (instance locale, distante ou via docker)
-- **Docker & Docker Compose** _(optionnel pour containerisation)_
-
----
-
-## 🏡 Installation locale
-
-1. **Cloner le dépôt**
-
-    ```bash
-    git clone <repository-url>
-    cd <repository-directory>
-    ```
-
-2. **Copier & configurer les variables d’environnement**
-
-    ```bash
-    cp .env.example .env
-    ```
-
-    Puis éditez `.env` et renseignez vos paramètres :
-
-    ```dotenv
-        # Development Environment Configuration Template
-        # Copy this file to .env.development and fill in the actual values
-
-        # Server Configuration
-        NODE_ENV=development
-        PORT=3000
-        HOST=0.0.0.0
-        LOG_LEVEL=info
-
-        # Security - REQUIRED
-        # Generate a strong API key (minimum 16 characters, recommended 32+)
-        # Example: openssl rand -hex 32
-        API_KEY=6fdb0b593edeba06ed02175246a6042966bde13330d800bc1d994530fbdbe89d
-
-        # Database Configuration (PostgreSQL)
-        DATABASE_HOST=postgres
-        DATABASE_PORT=5432
-        DATABASE_USER=promocode_user
-        DATABASE_PASSWORD=promocode_password
-        DATABASE_NAME=promocode_db
-
-        # Either provide DATABASE_URL or individual components
-        DATABASE_URL=postgresql://${DATABASE_USER}:${DATABASE_PASSWORD}@${DATABASE_HOST}:${DATABASE_PORT}/${DATABASE_NAME}
-
-        # External APIs (OpenWeatherMap)
-        OPENWEATHERMAP_API_KEY=your-openweather-api-key-here
-        OPENWEATHERMAP_API_URL=https://api.openweathermap.org/data/2.5
-
-        # CORS Configuration (optional)
-        ALLOWED_ORIGINS=http://localhost:3000,http://127.0.0.1:3000
-
-        # Weather Service Configuration
-        # Set to 'false' for production to use real OpenWeatherMap API
-        USE_MOCK_WEATHER=true
-    ```
-
-3. **Installer les dépendances**
-
-    ```bash
-    npm install
-    ```
-
-4. **Initialiser la base (Prisma)**
-
-    - Appliquer les migrations :
-
-        ```bash
-        npx prisma migrate dev --name init
-        ```
-
-    - Générer le client Prisma :
-
-        ```bash
-        npx prisma generate
-        ```
-
-5. **Transpilation de l’application (TypeScript → JavaScript)**
-
-    ```bash
-    npm run build
-    ```
-
-6. **Démarrer l’API**
-
-    ```bash
-    npm start
-    ```
-
-    > Le serveur écoute par défaut sur `http://localhost:3000`.
-    > Pour la doc Swagger : `http://localhost:3000/documentation`
-
-7. **Mode développement**
-   Pour relancer automatiquement à chaque changement de code :
-
-    ```bash
-    npm run dev
-    ```
-
-8. **Tests unitaires (Jest)**
-   Pour lancer la suite de tests :
-    ```bash
-    npm test
-    ```
+* **Node.js** ≥ 22.x
+* **npm** (comes with Node.js)
+* **PostgreSQL** (local, remote, or via Docker)
+* **Docker & Docker Compose** *(optional, for containerization)*
 
 ---
 
-## 🐳 Lancer avec Docker / Docker Compose
+## 🏡 Local Installation
 
-Deux fichiers `docker-compose.yml` et `docker-compose.db.yml` sont fournis :
+1. **Clone the repository**
 
-- **`docker-compose.db.yml`** : démarre la base PostgreSQL
-- **`docker-compose.yml`** : démarre uniquement l’API (utile si vous avez déjà PostgreSQL)
+   ```bash
+   git clone <repository-url>
+   cd <repository-directory>
+   ```
 
-### 1. Créer `.env` pour Docker
+2. **Copy & configure environment variables**
 
-Copiez les mêmes variables `.env` que pour l’installation locale. Docker Compose les injectera automatiquement.
+   ```bash
+   cp .env.example .env
+   ```
 
-### 2. Démarrage (Si vous n'avez pas déjà de base de données PostgreSQL existante)
+   Then edit `.env` and fill in your settings:
+
+   ```dotenv
+   # Development Environment Configuration Template
+
+   # Server
+   NODE_ENV=development
+   PORT=3000
+   HOST=0.0.0.0
+   LOG_LEVEL=info
+
+   # Security - REQUIRED
+   # Generate a strong API key (min 16 chars, recommended 32+)
+   # Example: openssl rand -hex 32
+   API_KEY=6fdb0b593edeba06ed02175246a6042966bde13330d800bc1d994530fbdbe89d
+
+   # Database (PostgreSQL)
+   DATABASE_HOST=postgres
+   DATABASE_PORT=5432
+   DATABASE_USER=promocode_user
+   DATABASE_PASSWORD=promocode_password
+   DATABASE_NAME=promocode_db
+
+   # Alternatively, provide DATABASE_URL instead of individual parts
+   DATABASE_URL=postgresql://${DATABASE_USER}:${DATABASE_PASSWORD}@${DATABASE_HOST}:${DATABASE_PORT}/${DATABASE_NAME}
+
+   # External APIs (OpenWeatherMap)
+   OPENWEATHERMAP_API_KEY=your-openweather-api-key-here
+   OPENWEATHERMAP_API_URL=https://api.openweathermap.org/data/2.5
+
+   # CORS (optional)
+   ALLOWED_ORIGINS=http://localhost:3000,http://127.0.0.1:3000
+
+   # Weather Service
+   # Use 'false' in production to call the real OpenWeatherMap API
+   USE_MOCK_WEATHER=true
+   ```
+
+3. **Install dependencies**
+
+   ```bash
+   npm install
+   ```
+
+4. **Initialize the database (Prisma)**
+
+   * Apply migrations:
+
+     ```bash
+     npx prisma migrate dev --name init
+     ```
+
+   * Generate the Prisma client:
+
+     ```bash
+     npx prisma generate
+     ```
+
+5. **Build the app (TypeScript → JavaScript)**
+
+   ```bash
+   npm run build
+   ```
+
+6. **Start the API**
+
+   ```bash
+   npm start
+   ```
+
+   > By default, the server runs at `http://localhost:3000`
+   > Swagger docs: `http://localhost:3000/documentation`
+
+7. **Development mode**
+
+   For automatic reload on code changes:
+
+   ```bash
+   npm run dev
+   ```
+
+8. **Run tests (Jest)**
+
+   To run the unit tests:
+
+   ```bash
+   npm test
+   ```
+
+---
+
+## 🐳 Running with Docker / Docker Compose
+
+Two `docker-compose` files are provided:
+
+* **`docker-compose.db.yml`** — starts a PostgreSQL database
+* **`docker-compose.yml`** — starts the API only (useful if you already have PostgreSQL running)
+
+### 1️⃣ Create `.env` for Docker
+
+Copy the same `.env` used for local installation. Docker Compose will automatically inject it.
+
+### 2️⃣ Start services (if you don’t have an existing PostgreSQL)
 
 ```bash
 docker compose -f docker-compose.db.yml up -d
 ```
 
-Cela lancera :
+This will start:
 
-- **postgres** (port 5432)
-- **migrate** (prisma migration)
-- **adminer** (port 8080)
+* **postgres** (port 5432)
+* **migrate** (runs Prisma migration)
+* **adminer** (database UI at port 8080)
 
-Une fois les services up, vous pouvez en suite utiliser la commande de l'étape 3
+Once everything is up, continue with step 3.
 
-### 3. Démarrage en mode « standalone » (si PostgreSQL existe déjà ou après avoir lancer)
+### 3️⃣ Start the API (standalone)
+
+Use this if PostgreSQL is already running, or after starting it in step 2:
 
 ```bash
 docker compose up -d
 ```
 
-Cela lancera :
+This will start:
 
-- **app** (port 3000)
-
----
-
-## ✅ Vérification
-
-- **Ping santé**
-
-    ```bash
-    curl http://localhost:3000/ping
-    ```
-
-    → doit renvoyer `{ "status": "ok", "timestamp": "…" }`
-
-- **Swagger / OpenAPI**
-  Ouvrez :
-
-    ```
-    http://localhost:3000/documentation
-    ```
-
-- **Endpoints Promocode**
-
-    - `POST /api/promocodes`
-    - `POST /api/promocodes/validate`
-    - etc.
+* **app** (port 3000)
 
 ---
 
-## 📘 Ressources
+## ✅ Verification
 
-- **Doc Prisma** : [https://www.prisma.io/docs](https://www.prisma.io/docs)
-- **Swagger UI** intégré : `/documentation`
-- **README.md** pour plus de détails sur l’architecture
+* **Health check**
+
+  ```bash
+  curl http://localhost:3000/ping
+  ```
+
+  → Should return `{ "status": "ok", "timestamp": "…" }`
+
+* **Swagger / OpenAPI**
+
+  Open in your browser:
+
+  ```
+  http://localhost:3000/documentation
+  ```
+
+* **Promocode endpoints**
+
+  * `POST /api/promocodes`
+  * `POST /api/promocodes/validate`
+  * and more.
+
+---
+
+## 📘 Resources
+
+* **Prisma Docs:** [https://www.prisma.io/docs](https://www.prisma.io/docs)
+* **Built-in Swagger UI:** `/documentation`
+* **README.md:** for more about the architecture
 
 ---

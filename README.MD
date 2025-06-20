@@ -1,70 +1,110 @@
 # Promocode API
 
-## 📊 Synthèse du projet « Promocode API »
+A service for validating promotion codes against a dynamic set of business rules, manageable via a REST API.
 
-> Pour l’installation, merci de vous référer au fichier [INSTALLATION.MD](./INSTALLATION.MD).
-
----
-
-## 🚀 Améliorations proposées
-
-1. **Protection brute-force (Lot 1)**
-
-    - Intégrer **fail2ban** en production pour bloquer les `404` sur `/promocodes/validate`.
-    - Seuil suggéré : \~ 10 tentatives/s avant bannissement.
-
-2. **Gestion des tokens (Lot 1)**
-
-    - Ajouter **Keycloak** pour l’authentification OAuth2/JWT.
-    - À planifier comme premier incrément formel (Lot 1).
-
-3. **Internationalisation & ressources (Lot 1)**
-
-    - Mettre en place un système i18n clé/valeur pour les messages.
-    - Le frontend résout dynamiquement selon la langue de l’utilisateur.
-
-4. **Configuration dynamique (Lot 1)**
-
-    - Exposer davantage de variables d’environnement (timeouts, seuils, URLs…) pour que les **SRE/DevOps** ajustent sans redeploy.
-
-5. **Rate-limiting application-side (Lot 1)**
-
-    - Utiliser **@fastify/rate-limit** par utilisateur ou clé API.
-    - Conserver **Nginx** + **fail2ban** pour rafales ou attaques réseau.
-
-6. **Cache Redis pour OpenWeatherMap (Lot 1-2)**
-
-    - Remplacer le cache en mémoire par **Redis** pour persistance et partage inter-instances.
-
-7. **UI pour json-rules-engine (Lot 2)**
-
-    - Intégrer l’éditeur visuel de règles métier : [json-rule-editor](https://github.com/vinzdeveloper/json-rule-editor).
-
-8. **Erreurs plus claires (Lot 1)**
-
-    - Normaliser le format de réponse en cas de refus :
-
-        ```json
-        {
-            "promocode_name": "TEST666",
-            "status": "denied",
-            "reasons": [
-                "Condition for 'age' was not met: expected 25 to be equal 666",
-                "Condition for 'weather' was not met: expected undefined to be equal \"clear\" (on path: $.is)",
-                "Condition for 'weather' was not met: expected undefined to be greaterThan 15 (on path: $.temp)"
-            ]
-        }
-        ```
+Built with Node.js, Fastify, and Prisma.
 
 ---
 
-## 📅 Roadmap suggérée
+## ✨ Features
 
-| Lot   | Contenu principal                                                    |
-| ----- | -------------------------------------------------------------------- |
-| **0** | Base fonctionnelle de l’API (code actuel)                            |
-| **1** | Auth (Keycloak), rate-limit, fail2ban, i18n, config dynamique        |
-| **2** | Cache Redis, éditeur UI pour règles                                  |
-| **3** | Image Docker distroless pour une empreinte réduite et plus sécurisée |
+* **Dynamic Rule Engine** — Validates promocodes with flexible, complex rules using [`json-rules-engine`](https://github.com/CacheControl/json-rules-engine).
+* **REST API** — Create, update, and validate promocodes via a fully-documented API.
+* **Database** — Uses Prisma as an ORM for PostgreSQL.
+* **API Docs** — OpenAPI/Swagger documentation out of the box.
+* **Containerized** — Easily deployable with Docker.
+
+---
+
+## 🛠️ Tech Stack
+
+* **Backend:** [Node.js](https://nodejs.org/), [Fastify](https://www.fastify.io/), [TypeScript](https://www.typescriptlang.org/)
+* **Database:** [PostgreSQL](https://www.postgresql.org/)
+* **ORM:** [Prisma](https://www.prisma.io/)
+* **Business Rules:** [json-rules-engine](https://github.com/CacheControl/json-rules-engine)
+* **Testing:** [Jest](https://jestjs.io/)
+* **Containerization:** [Docker](https://www.docker.com/)
+
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+* [Node.js](https://nodejs.org/en/download/) (v18+)
+* [Docker](https://docs.docker.com/get-docker/) and [Docker Compose](https://docs.docker.com/compose/install/)
+
+### Installation
+
+For complete installation instructions, see [INSTALLATION.MD](./INSTALLATION.MD).
+
+A quick Docker-based setup is also available.
+
+---
+
+## 🏃‍♀️ Usage
+
+### Local Development
+
+Run in dev mode with hot reloading:
+
+```bash
+npm install
+npm run dev
+```
+
+By default, the server runs at [http://localhost:3000](http://localhost:3000).
+
+### Production
+
+To build and start in production mode:
+
+```bash
+npm install
+npm run build
+npm start
+```
+
+### With Docker
+
+Spin up the application and database with Docker Compose:
+
+```bash
+# Ensure you have a .env file (see .env.example)
+# For details, check INSTALLATION.MD
+
+docker-compose -f docker-compose.yml -f docker-compose.db.yml up --build
+```
+
+The server will be available at [http://localhost:3000](http://localhost:3000).
+
+---
+
+## 🧪 Running Tests
+
+Run the test suite with:
+
+```bash
+npm test
+```
+
+---
+
+## 📚 API Documentation
+
+API docs are generated with OpenAPI and served automatically.
+
+* **Swagger UI:** [http://localhost:3000/documentation](http://localhost:3000/documentation)
+* **OpenAPI spec:** `static/openapi.yaml`
+
+---
+
+## 🗺️ Roadmap
+
+Planned milestones for upcoming features:
+
+* **Milestone 1:** Keycloak authentication, advanced rate limiting, i18n support, dynamic configuration.
+* **Milestone 2:** Redis cache for external APIs (e.g., OpenWeatherMap) and a visual UI for editing rules.
+* **Milestone 3:** Optimized distroless Docker image for minimal footprint and improved security.
 
 ---
